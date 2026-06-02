@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit express · NexusAI Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Mulish:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0b2a1f; --green2:#123a2b; --gold:#c2a25a; --gold-soft:#d8c08a;
+    --cream:#f4eede; --cream2:#fbf8f1; --ink:#1c2620; --muted:#6f7d73;
+    --ok:#2e7d52; --line:rgba(255,255,255,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Mulish',system-ui,sans-serif;
+    background:radial-gradient(120% 120% at 50% 0%,var(--green2) 0%,var(--green) 60%);
+    color:var(--cream); min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px 16px; line-height:1.5;
+  }
+  .wrap{width:100%; max-width:560px}
+  .brand{display:flex; align-items:center; gap:10px; margin-bottom:18px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+  .brand b{font-family:'Space Mono',monospace; font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-soft); font-weight:400}
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
+    border:1px solid var(--line); border-radius:18px; padding:26px 22px 24px;
+    backdrop-filter:blur(6px); box-shadow:0 24px 60px -30px rgba(0,0,0,.7);
+  }
+  .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.10);overflow:hidden;margin-bottom:22px}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-soft));border-radius:99px;transition:width .4s ease}
+  .step-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold-soft);letter-spacing:.12em;margin-bottom:10px}
+  h1{font-family:'Playfair Display',serif;font-weight:700;font-size:34px;line-height:1.12;color:var(--cream2);margin-bottom:10px}
+  h2{font-family:'Playfair Display',serif;font-weight:600;font-size:23px;line-height:1.2;color:var(--cream2);margin-bottom:6px}
+  .sub{color:#c9d3cb;font-size:14.5px;margin-bottom:20px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    text-align:left;width:100%;cursor:pointer;font:inherit;color:var(--cream);
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;font-size:15px;transition:.15s;display:flex;align-items:center;gap:12px;
+  }
+  .opt:hover{border-color:var(--gold);background:rgba(194,162,90,.10);transform:translateY(-1px)}
+  .opt .tick{width:18px;height:18px;border-radius:6px;border:1.5px solid var(--muted);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--green)}
+  .opt.sel{border-color:var(--gold);background:rgba(194,162,90,.16)}
+  .opt.sel .tick{background:var(--gold);border-color:var(--gold)}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;color:#c9d3cb;margin-bottom:6px;font-weight:600}
+  .field label span{color:var(--gold-soft)}
+  .field input{
+    width:100%;font:inherit;font-size:15px;color:var(--cream2);
+    background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:11px;padding:13px 14px;
+  }
+  .field input:focus{outline:none;border-color:var(--gold)}
+  .consent{display:flex;gap:11px;align-items:flex-start;background:rgba(0,0,0,.16);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:6px 0 18px;cursor:pointer}
+  .consent input{margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--gold)}
+  .consent span{font-size:13px;color:#c2ccc4}
+  .btn{
+    width:100%;cursor:pointer;font:inherit;font-weight:700;font-size:15.5px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-soft));color:#241c08;
+    border:none;border-radius:12px;padding:15px;transition:.15s;margin-top:4px;
+  }
+  .btn:hover{filter:brightness(1.05)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+  .btn.ghost{background:transparent;color:var(--gold-soft);border:1px solid var(--line);font-weight:600;margin-top:10px}
+  .back{background:none;border:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;margin-top:16px;padding:4px}
+  .back:hover{color:var(--cream)}
+  .res-badge{font-family:'Space Mono',monospace;font-size:12px;color:var(--gold-soft);letter-spacing:.1em;margin-bottom:14px}
+  .res-line{background:rgba(0,0,0,.18);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:14.5px;color:#e7ecdf}
+  .foot{text-align:center;margin-top:18px;font-size:11.5px;color:rgba(255,255,255,.4)}
+  .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(36,28,8,.3);border-top-color:#241c08;border-radius:50%;animation:r .7s linear infinite;vertical-align:-3px;margin-right:8px}
+  @keyframes r{to{transform:rotate(360deg)}}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="dot"></span><b>NexusAI&nbsp;·&nbsp;Audit express</b></div>
+  <div class="card">
+    <div class="bar"><i id="bar"></i></div>
+    <div id="screen"></div>
+    <button class="back hide" id="back" onclick="goBack()">← Retour</button>
+  </div>
+  <div class="foot">Tes réponses servent uniquement à préparer notre échange. Aucune donnée revendue.</div>
+</div>
+
+<script>
+/* ============================================================
+   À CONFIGURER (2 lignes) — colle tes vraies URL puis redéploie
+   ============================================================ */
+const WEBHOOK_URL = "https://bgchzefgwuokqxlsjnyj.supabase.co/functions/v1/audit"; // Edge Function Supabase (live)
+const CAL_URL     = "https://cal.com/nexusaiagency.fwi/audit-decouverte";    // ex: https://cal.com/nexusai/audit
+/* ============================================================ */
+
+const QUESTIONS = [
+  { key:'secteur', type:'single', title:"Ton activité, c'est plutôt…", sub:"Pour adapter les exemples à ton métier.",
+    options:["Restaurant / Food","Artisan & services","Pro libéral (santé, droit…)","Commerce / boutique","Gîte / location","Autre"] },
+  { key:'presence', type:'single', title:"Ta présence en ligne aujourd'hui ?", sub:"Sois honnête, c'est le point de départ.",
+    options:["Aucun site","Juste une page Facebook/Insta","Un site mais vieux/lent","Un site correct mais qui convertit peu"] },
+  { key:'canal', type:'single', title:"Tes clients te contactent surtout par…", sub:"",
+    options:["Téléphone","WhatsApp","DM réseaux sociaux","Formulaire / site","Un peu de tout"] },
+  { key:'demandes_ratees', type:'single', title:"Il t'arrive de rater des appels ou messages ?", sub:"Demandes qui passent à la trappe faute de temps.",
+    options:["Souvent","Parfois","Rarement","Je ne sais pas"] },
+  { key:'taches', type:'multi', title:"Qu'est-ce qui te bouffe le plus de temps ?", sub:"Plusieurs choix possibles.",
+    options:["Répondre aux mêmes questions","Faire les devis","Relancer les clients","Gérer RDV / réservations","Factures / paperasse","Rien de tout ça"] },
+  { key:'heures', type:'single', title:"Combien d'heures par semaine sur ces tâches ?", sub:"",
+    options:["Moins de 2h","2-5h","5-10h","Plus de 10h"] },
+  { key:'priorite', type:'single', title:"Si tu devais régler UNE chose en priorité ?", sub:"",
+    options:["Être visible sur Google / avoir un site","Refondre mon site actuel","Un agent qui répond aux appels","Automatiser mes tâches","Un peu tout ça"] },
+  { key:'timing', type:'single', title:"Tu voudrais avancer quand ?", sub:"",
+    options:["Au plus vite","Dans 1 à 3 mois","Plus tard cette année","Je me renseigne"] },
+];
+
+const answers = {};
+let step = -1; // -1 intro, 0..N-1 questions, N contact, N+1 result
+const N = QUESTIONS.length;
+
+const screen = document.getElementById('screen');
+const bar = document.getElementById('bar');
+const backBtn = document.getElementById('back');
+
+function source(){
+  const p = new URLSearchParams(location.search);
+  return p.get('src') || p.get('utm_source') || p.get('post') || p.get('kw') || 'direct';
+}
+
+function setBar(){
+  let pct = 0;
+  if (step === -1) pct = 4;
+  else if (step < N) pct = 8 + (step/(N))*70;
+  else if (step === N) pct = 84;
+  else pct = 100;
+  bar.style.width = pct + '%';
+  backBtn.classList.toggle('hide', step <= 0 || step > N);
+}
+
+function render(){
+  setBar();
+  if (step === -1) return renderIntro();
+  if (step < N) return renderQuestion(QUESTIONS[step]);
+  if (step === N) return renderContact();
+  return renderResult();
+}
+
+function renderIntro(){
+  screen.innerHTML = `
+    <div class="step-tag">2 MINUTES · 8 QUESTIONS</div>
+    <h1>Découvre ce qui te fait perdre des clients.</h1>
+    <p class="sub">Réponds à 8 questions rapides. À la fin, tu vois le levier prioritaire pour ton activité — et on décide ensemble de la suite.</p>
+    <button class="btn" onclick="next()">Commencer l'audit</button>`;
+}
+
+function renderQuestion(q){
+  const cur = answers[q.key] || (q.type==='multi'?[]:null);
+  const opts = q.options.map(o=>{
+    const sel = q.type==='multi' ? cur.includes(o) : cur===o;
+    return `<button class="opt ${sel?'sel':''}" onclick="pick('${q.key}','${q.type}',this)" data-v="${o.replace(/"/g,'&quot;')}">
+      <span class="tick">${sel?'✓':''}</span><span>${o}</span></button>`;
+  }).join('');
+  screen.innerHTML = `
+    <div class="step-tag">QUESTION ${step+1} / ${N}</div>
+    <h2>${q.title}</h2>${q.sub?`<p class="sub">${q.sub}</p>`:'<div style="height:8px"></div>'}
+    <div class="opts">${opts}</div>
+    ${q.type==='multi'?`<button class="btn" id="cont" onclick="next()" ${cur.length?'':'disabled'}>Continuer</button>`:''}`;
+}
+
+function pick(key, type, el){
+  if (type==='multi'){
+    const v = el.dataset.v;
+    const arr = answers[key] || [];
+    const i = arr.indexOf(v);
+    if (i>=0) arr.splice(i,1); else arr.push(v);
+    answers[key] = arr;
+    el.classList.toggle('sel');
+    el.querySelector('.tick').textContent = el.classList.contains('sel')?'✓':'';
+    const cont = document.getElementById('cont');
+    if (cont) cont.disabled = arr.length===0;
+  } else {
+    answers[key] = el.dataset.v;
+    setTimeout(next, 160);
+  }
+}
+
+function renderContact(){
+  const a = answers;
+  screen.innerHTML = `
+    <div class="step-tag">DERNIÈRE ÉTAPE</div>
+    <h2>Où je t'envoie ton résultat ?</h2>
+    <p class="sub">Je prépare ton analyse et je te recontacte rapidement.</p>
+    <div class="field"><label>Prénom <span>*</span></label><input id="f_prenom" type="text" value="${a.prenom||''}" oninput="validate()"></div>
+    <div class="field"><label>Entreprise</label><input id="f_entreprise" type="text" value="${a.entreprise||''}" oninput="validate()"></div>
+    <div class="field"><label>Email <span>*</span></label><input id="f_email" type="email" value="${a.email||''}" oninput="validate()"></div>
+    <div class="field"><label>WhatsApp / Téléphone <span>*</span></label><input id="f_whatsapp" type="tel" value="${a.whatsapp||''}" oninput="validate()"></div>
+    <label class="consent">
+      <input id="f_consent" type="checkbox" ${a.consent?'checked':''} onchange="validate()">
+      <span>J'accepte d'être recontacté par NexusAI Agency au sujet de ma demande. Mes données ne sont jamais revendues. <span style="color:var(--gold-soft)">*</span></span>
+    </label>
+    <button class="btn" id="submit" onclick="submitForm()" disabled>Voir mon résultat</button>`;
+  validate();
+}
+
+function validate(){
+  const prenom = val('f_prenom'), email = val('f_email'), wa = val('f_whatsapp');
+  const consent = document.getElementById('f_consent')?.checked;
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const ok = prenom.length>=2 && emailOk && wa.replace(/\D/g,'').length>=6 && consent;
+  const b = document.getElementById('submit');
+  if (b) b.disabled = !ok;
+  return ok;
+}
+function val(id){ const e=document.getElementById(id); return e?e.value.trim():''; }
+
+function analyse(a){
+  const taches = a.taches || [];
+  const real = taches.filter(t=>t!=='Rien de tout ça');
+  const besoins = new Set();
+  if (a.presence==='Aucun site' || a.presence==='Juste une page Facebook/Insta') besoins.add('Site');
+  if (a.presence==='Un site mais vieux/lent' || a.presence==='Un site correct mais qui convertit peu') besoins.add('Refonte');
+  if (a.demandes_ratees==='Souvent' || a.demandes_ratees==='Parfois') besoins.add('Voice');
+  if (real.length) besoins.add('Automatisation');
+  const map = {
+    "Être visible sur Google / avoir un site":"Site",
+    "Refondre mon site actuel":"Refonte",
+    "Un agent qui répond aux appels":"Voice",
+    "Automatiser mes tâches":"Automatisation",
+    "Un peu tout ça":"Multi"
+  };
+  let besoin = map[a.priorite] || [...besoins][0] || 'Site';
+  if (besoin==='Multi' || besoins.size>=3) besoin='Multi';
+  let score = 0;
+  score += ({"Au plus vite":30,"Dans 1 à 3 mois":25,"Plus tard cette année":10,"Je me renseigne":5})[a.timing]||0;
+  score += ({"Souvent":25,"Parfois":15,"Rarement":5,"Je ne sais pas":5})[a.demandes_ratees]||0;
+  score += Math.min(real.length*5,25);
+  score += ({"Moins de 2h":0,"2-5h":5,"5-10h":10,"Plus de 10h":20})[a.heures]||0;
+  if (besoins.has('Site')||besoins.has('Refonte')) score += 15;
+  score = Math.min(score,100);
+  const fast = (a.timing==='Au plus vite' || a.timing==='Dans 1 à 3 mois');
+  const simple = (besoin==='Site'||besoin==='Refonte') && real.length<=1 && a.demandes_ratees!=='Souvent' && besoin!=='Multi';
+  const routage = (simple && fast) ? 'Proposition' : 'Appel';
+  return { besoin, score, routage };
+}
+
+async function submitForm(){
+  if(!validate()) return;
+  answers.prenom = val('f_prenom');
+  answers.entreprise = val('f_entreprise');
+  answers.email = val('f_email');
+  answers.whatsapp = val('f_whatsapp');
+  answers.consent = document.getElementById('f_consent').checked;
+
+  const r = analyse(answers);
+  const payload = { ...answers, ...r, source:source(), page_url:location.href, submitted_at:new Date().toISOString() };
+
+  const btn = document.getElementById('submit');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Analyse en cours…';
+
+  const isPlaceholder = WEBHOOK_URL.includes('COLLE_TON');
+  if (!isPlaceholder){
+    try{
+      await fetch(WEBHOOK_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    }catch(e){ /* on affiche le résultat même si le webhook échoue */ }
+  }
+  answers._result = r;
+  step = N+1; render();
+}
+
+function renderResult(){
+  const r = answers._result || analyse(answers);
+  const reco = {
+    "Site":"Ton besoin n°1 : une présence pro qui te ramène des clients (site rapide + visibilité Google).",
+    "Refonte":"Ton site actuel ne travaille pas assez pour toi. Une refonte orientée conversion changerait la donne.",
+    "Voice":"Tu perds des demandes faute de répondre à temps. Un agent qui prend appels et messages 24/7 réglerait ça.",
+    "Automatisation":"Tu passes trop d'heures sur des tâches répétitives — une bonne partie peut être automatisée.",
+    "Multi":"Plusieurs leviers ressortent. Le plus efficace : qu'on en parle 15 min pour prioriser."
+  }[r.besoin];
+
+  const cta = (r.routage==='Proposition' && !CAL_URL.includes('COLLE_TON'))
+    ? `<button class="btn" onclick="window.open('${CAL_URL}','_blank')">Réserver un point rapide</button>
+       <p class="sub" style="margin-top:14px;margin-bottom:0">Tu peux aussi attendre : je t'envoie une proposition adaptée sous 48h.</p>`
+    : (r.routage==='Proposition')
+      ? `<div class="res-line">Je prépare une proposition adaptée à ton activité. Tu la reçois sous 48h par email.</div>`
+      : (!CAL_URL.includes('COLLE_TON')
+          ? `<button class="btn" onclick="window.open('${CAL_URL}','_blank')">Réserver mon appel découverte (15-30 min)</button>`
+          : `<div class="res-line">Je te recontacte très vite pour caler un appel découverte de 15-30 min.</div>`);
+
+  screen.innerHTML = `
+    <div class="res-badge">✓ ANALYSE TERMINÉE</div>
+    <h2>C'est noté, ${answers.prenom}.</h2>
+    <p class="sub">Voici ce qui ressort de tes réponses.</p>
+    <div class="res-line">${reco}</div>
+    ${cta}`;
+  bar.style.width = '100%';
+  backBtn.classList.add('hide');
+}
+
+function next(){ step++; render(); }
+function goBack(){ if(step>-1){ step--; render(); } }
+
+render();
+</script>
+</body>
+</html>
